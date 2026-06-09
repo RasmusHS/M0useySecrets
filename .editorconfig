@@ -1,0 +1,43 @@
+root = true
+
+# All files
+[*]
+indent_style = space
+
+# Applies to all C# (.cs) files in the project
+[*.cs]
+
+#### 1. Namespace Format (Removes block braces) ####
+# Forces file-scoped namespaces (instead of traditional block scoping)
+csharp_style_namespace_declarations = file_scoped:warning
+
+#### 2. Accessibility Modifiers ####
+# Requires accessibility modifiers (e.g., public/internal) to be explicitly declared
+dotnet_style_require_accessibility_modifiers = always:warning
+
+#### 3. Automatic Cleanup of 'using' Directives ####
+# Sorts 'using' directives alphabetically, but places 'System' namespaces first
+dotnet_sort_system_directives_first = true:suggestion
+# Marks unused usings as unnecessary (dims them in VS and allows automatic removal)
+dotnet_diagnostic.IDE0005.severity = warning
+
+#### 4. ReSharper Code Style & Brace Formatting ####
+# Controls spacing around parentheses and keywords
+csharp_space_between_parentheses = false
+csharp_space_after_keywords_in_control_flow_statements = true
+
+# Forces new lines for braces to keep formatting consistent and clean
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+
+#### 5. General Formatting (Tabs & Indentation) ####
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+insert_final_newline = true
+
+# Xml files
+[*.xml]
+indent_size = 2
