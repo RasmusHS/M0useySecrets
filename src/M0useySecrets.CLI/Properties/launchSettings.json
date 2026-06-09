@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "M0useySecrets.CLI": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
