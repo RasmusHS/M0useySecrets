@@ -12,13 +12,9 @@ public class SecureKeyContext : IDisposable
     public SecureKeyContext(byte[] key)
     {
         _key = key;
+        //_key = new byte[key.Length];
         _isLocked = false;
-        _disposed = false
-
-        // 1. defensive copy: _key = new byte[key.Length], copy bytes in
-        //    (so the caller can't mutate your internal state)
-        // 2. _isLocked = false
-        // 3. _disposed = false
+        _disposed = false;
     }
 
     public byte[] Key
@@ -42,16 +38,18 @@ public class SecureKeyContext : IDisposable
     public void Lock()
     {
         // if already locked, no-op (safe to call multiple times)
-        CryptographicOperations.ZeroMemory(_key);
-        _isLocked = true;
+        if (!_isLocked)
+        {
+            CryptographicOperations.ZeroMemory(_key);
+            _isLocked = true;
+        }
     }
 
     protected virtual void Dispose(bool disposing)
     {
-        // if _disposed → return
         if (_disposed) return;
 
-        // Lock()   ← zeroes the key if not already done
+        // Zeroes the key if not already done
         Lock();
 
         _disposed = true;
@@ -60,10 +58,12 @@ public class SecureKeyContext : IDisposable
     public void Dispose()
     {
         // call Lock() if not already locked
-        // optionally set a _disposed flag to make double-dispose safe
+        if (!_isLocked)
+        {
+            Lock();
+            Dispose(true);
+        }
 
-        Dispose(true);
         GC.SuppressFinalize(this);
-        //throw new NotImplementedException();
     }
 }
