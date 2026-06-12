@@ -120,7 +120,7 @@ public class AesEncryptor
         {
             byte[] plaintext = DecryptValue(ciphertext, nonce, tag, kek);
 
-            // 2. compare plaintext to expected sentinel bytes
+            // 2. compare plaintext to expected sentinel bytes 
 
 
             // 3. return true if match
