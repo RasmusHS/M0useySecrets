@@ -25,7 +25,7 @@ public class SecureKeyContext : IDisposable
             // if _isLocked → throw VaultLockedException
             // return _key
             if (_disposed)
-                throw new ObjectDisposedException();
+                throw new ObjectDisposedException(nameof(SecureKeyContext));
 
             if (_isLocked)
                 throw new VaultLockedException();

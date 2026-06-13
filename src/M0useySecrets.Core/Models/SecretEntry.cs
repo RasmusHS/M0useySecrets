@@ -20,12 +20,6 @@ public class SecretEntry
     /// </summary>
     public string Namespace { get; set; } = "default";
 
-    /// <summary>
-    /// The actual secret.
-    /// Stored in plaintext inside the vault, but entire vault is encrypted at rest.
-    /// </summary>
-    public string Value { get; set; }
-
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
