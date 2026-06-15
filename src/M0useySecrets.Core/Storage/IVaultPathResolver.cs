@@ -1,6 +1,6 @@
 namespace M0useySecrets.Core.Storage;
 
-public class VaultPathResolver : IVaultPathResolver
+public interface IVaultPathResolver
 {
     /// <summary>
     /// The name of the directory where the vault file is stored. 
@@ -20,45 +20,25 @@ public class VaultPathResolver : IVaultPathResolver
     /// For Linux and macOS, this would be something like "/home/username/.m0useysecrets" or "/Users/username/.m0useysecrets".
     /// </summary>
     /// <returns>The full path to the vault directory.</returns>
-    public string GetVaultDirectory()
-    {
-        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-
-        var vaultDirectory = Path.Combine(userProfile, VaultDirectory);
-
-        return vaultDirectory;
-    }
+    string GetVaultDirectory();
 
     /// <summary>
     /// Gets the full path to the vault file, which is located within the vault directory. The vault file is named "vault.enc".
     /// </summary>
     /// <returns>The full path to the vault file.</returns>
-    public string GetVaultPath()
-    {
-        var vaultDirectory = GetVaultDirectory();
-        var vaultPath = Path.Combine(vaultDirectory, VaultFileName);
-        return vaultPath;
-    }
+    string GetVaultPath();
 
     /// <summary>
     /// Checks if the vault file exists at the expected location. 
     /// This method returns true if the vault file is found, and false otherwise.
     /// </summary>
     /// <returns>True if the vault file exists, false otherwise.</returns>
-    public bool VaultExists()
-    {
-        var vaultPath = GetVaultPath();
-        return File.Exists(vaultPath);
-    }
+    bool VaultExists();
 
     /// <summary>
     /// Ensures that the vault directory exists. 
     /// If the directory does not exist, it will be created. 
     /// This method does not check for the existence of the vault file itself, only the directory that contains it.
     /// </summary>
-    public void EnsureDirectoryExists()
-    {
-        var vaultDirectory = GetVaultDirectory();
-        Directory.CreateDirectory(vaultDirectory);
-    }
+    void EnsureDirectoryExists();
 }
