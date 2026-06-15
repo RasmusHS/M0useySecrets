@@ -3,7 +3,7 @@ using M0useySecrets.Core.Models;
 
 namespace M0useySecrets.Core.Crypto;
 
-public class AesEncryptor
+public class AesEncryptor : IAesEncryptor
 {
     private const int NonceSizeBytes = 12;    // AES-GCM standard
     private const int TagSizeBytes = 16;      // 128-bit tag
