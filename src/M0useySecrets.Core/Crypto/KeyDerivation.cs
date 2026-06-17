@@ -1,7 +1,11 @@
 using System.Security.Cryptography;
+using M0useySecrets.Core.Crypto.Interfaces;
 
 namespace M0useySecrets.Core.Crypto;
 
+/// <summary>
+/// Implements key derivation and generation logic for the vault.
+/// </summary>
 public class KeyDerivation : IKeyDerivation
 {
     private const int KeySizeBytes = 32;

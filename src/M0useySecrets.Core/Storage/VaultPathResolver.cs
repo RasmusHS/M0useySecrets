@@ -1,3 +1,5 @@
+using M0useySecrets.Core.Storage.Interfaces;
+
 namespace M0useySecrets.Core.Storage;
 
 public class VaultPathResolver : IVaultPathResolver

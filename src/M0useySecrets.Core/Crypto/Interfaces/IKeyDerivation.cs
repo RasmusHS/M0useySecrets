@@ -1,4 +1,4 @@
-namespace M0useySecrets.Core.Crypto;
+namespace M0useySecrets.Core.Crypto.Interfaces;
 
 public interface IKeyDerivation
 {

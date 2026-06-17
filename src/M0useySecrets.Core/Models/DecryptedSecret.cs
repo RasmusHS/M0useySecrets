@@ -24,7 +24,7 @@ public class DecryptedSecret
     /// The actual secret.
     /// Stored in plaintext inside the vault, but entire vault is encrypted at rest.
     /// </summary>
-    public string Value { get; set; }
+    public string? Value { get; set; }
 
     public DateTime CreatedAt { get; set; }
 

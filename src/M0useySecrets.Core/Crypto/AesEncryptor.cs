@@ -1,8 +1,12 @@
 using System.Security.Cryptography;
+using M0useySecrets.Core.Crypto.Interfaces;
 using M0useySecrets.Core.Models;
 
 namespace M0useySecrets.Core.Crypto;
 
+/// <summary>
+/// Implements AES-GCM encryption and decryption for both value encryption (DEK encrypting secret values) and key wrapping (KEK encrypting DEKs).
+/// </summary>
 public class AesEncryptor : IAesEncryptor
 {
     private const int NonceSizeBytes = 12;    // AES-GCM standard

@@ -1,7 +1,9 @@
+using System.Security.Cryptography;
 using System.Text.Json;
-using M0useySecrets.Core.Crypto;
+using M0useySecrets.Core.Crypto.Interfaces;
 using M0useySecrets.Core.Exceptions;
 using M0useySecrets.Core.Models;
+using M0useySecrets.Core.Storage.Interfaces;
 
 namespace M0useySecrets.Core.Storage;
 
@@ -47,9 +49,11 @@ public class VaultStore : IVaultStore
 
         // 2. encrypt that JSON blob with the KEK
         EncryptionResult payload = _encryptor.EncryptValue(jsonBytes, kek);
+        CryptographicOperations.ZeroMemory(jsonBytes); // zero out plaintext JSON in memory immediately after use
 
         // 3. build the password check sentinel
         EncryptionResult sentinel = _encryptor.EncryptSentinel(kek);
+        CryptographicOperations.ZeroMemory(kek); // zero out KEK in memory immediately after use
 
         // 4. assemble the VaultFile object
         VaultFile file = new VaultFile

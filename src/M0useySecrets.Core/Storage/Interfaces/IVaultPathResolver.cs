@@ -1,4 +1,4 @@
-namespace M0useySecrets.Core.Storage;
+namespace M0useySecrets.Core.Storage.Interfaces;
 
 public interface IVaultPathResolver
 {

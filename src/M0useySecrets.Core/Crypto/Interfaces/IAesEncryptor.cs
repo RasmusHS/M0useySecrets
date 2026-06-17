@@ -1,7 +1,10 @@
 using M0useySecrets.Core.Models;
 
-namespace M0useySecrets.Core.Crypto;
+namespace M0useySecrets.Core.Crypto.Interfaces;
 
+/// <summary>
+/// Implements AES-GCM encryption and decryption for both value encryption (DEK encrypting secret values) and key wrapping (KEK encrypting DEKs).
+/// </summary>
 public interface IAesEncryptor
 {
     /// <summary>

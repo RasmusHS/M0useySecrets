@@ -1,6 +1,6 @@
 using M0useySecrets.Core.Models;
 
-namespace M0useySecrets.Core.Storage;
+namespace M0useySecrets.Core.Storage.Interfaces;
 
 public interface IVaultStore
 {
