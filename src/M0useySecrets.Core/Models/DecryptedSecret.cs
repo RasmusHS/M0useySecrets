@@ -40,5 +40,8 @@ public class DecryptedSecret
     /// </summary>
     public string? Notes { get; set; }
 
+    /// <summary>
+    /// Returns true if the secret is expired based on the ExpiresAt property.
+    /// </summary>
     public bool IsExpired => ExpiresAt.HasValue && ExpiresAt.Value < DateTime.UtcNow;
 }
