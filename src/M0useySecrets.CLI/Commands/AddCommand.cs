@@ -34,16 +34,12 @@ public static class AddCommand
             var notes = parseResult.GetValue(notesOption);
             var expires = parseResult.GetValue(expiresOption);
 
-            var vaultService = services.GetRequiredService<IVaultService>();
-            var secretService = services.GetRequiredService<ISecretService>();
-
-            string password = PasswordPrompt.ReadPassword();
-            vaultService.Unlock(password);
-
-            secretService.AddSecret(name, value, ns, expires, notes);
-            ConsoleOutput.PrintSuccess($"Secret '{name}' added.");
-
-            vaultService.Lock();
+            UnlockVault.WithUnlockedVault(services, () =>
+            {
+                var secretService = services.GetRequiredService<ISecretService>();
+                secretService.AddSecret(name, value, ns, expires, notes);
+                ConsoleOutput.PrintSuccess($"Secret '{name}' added.");
+            });
         });
 
         return command;

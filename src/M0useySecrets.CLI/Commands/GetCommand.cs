@@ -28,18 +28,13 @@ public static class GetCommand
             var ns = parseResult.GetValue(nsOption);
             var copy = parseResult.GetValue(copyOption);
 
-            // unlock → get → display or copy → lock
-            var vaultService = services.GetRequiredService<IVaultService>();
-            var secretService = services.GetRequiredService<ISecretService>();
-
-            string password = PasswordPrompt.ReadPassword();
-            vaultService.Unlock(password);
-
-            var secret = secretService.GetSecret(name, ns).Value;
-            ConsoleOutput.PrintSuccess($"Secret '{secret}' copied to clipboard"); // 
-            ClipboardHelper.CopyWithAutoClear(secret, 60);
-
-            vaultService.Lock();
+            UnlockVault.WithUnlockedVault(services, () =>
+            {
+                var secretService = services.GetRequiredService<ISecretService>();
+                var secret = secretService.GetSecret(name, ns).Value;
+                ConsoleOutput.PrintSuccess($"Secret '{secret}' copied to clipboard");
+                ClipboardHelper.CopyWithAutoClear(secret, 60);
+            });
         });
 
         return command;

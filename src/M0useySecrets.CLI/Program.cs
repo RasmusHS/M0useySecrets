@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using M0useySecrets.CLI.Commands;
 using M0useySecrets.Core.Crypto;
 using M0useySecrets.Core.Crypto.Interfaces;
 using M0useySecrets.Core.Services;
