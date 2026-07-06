@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+using M0useySecrets.Core.Exceptions;
 using M0useySecrets.Core.Services.Interfaces;
 
 namespace M0useySecrets.Core.Services;
@@ -5,47 +7,57 @@ namespace M0useySecrets.Core.Services;
 public class TemplateInjector : ITemplateInjector
 {
     private readonly ISecretService _secretService;
+    private static readonly Regex PlaceholderPattern = new(@"\{\{([^}]+)\}\}", RegexOptions.Compiled);
 
     public TemplateInjector(ISecretService secretService)
     {
         _secretService = secretService;
     }
 
-    public string InjectSecrets(string templateContent)
+    public string InjectSecrets(string templateContent, Action<string>? onWarning = null)
     {
-        // 1. find all placeholders matching a pattern like {{namespace/name}}
-        //    Regex: \{\{([^/}]+)/([^}]+)\}\}
-        //    group 1 = namespace, group 2 = secret name
-        //
+        return PlaceholderPattern.Replace(templateContent, match =>
+        {
+            string placeholder = match.Groups[1].Value.Trim();
 
+            string ns;
+            string name;
 
-        // 2. for each match:
-        //    a. call _secretService.GetSecret(name, namespace)
-        //    b. replace the placeholder with the decrypted value
-        //    c. if secret not found → decide on behavior:
-        //       option A: throw (fail fast, safest)
-        //       option B: leave placeholder untouched + warn
-        //
+            int separatorIndex = placeholder.IndexOf('/');
+            if (separatorIndex >= 0)
+            {
+                ns = placeholder[..separatorIndex];
+                name = placeholder[(separatorIndex + 1)..];
+            }
+            else
+            {
+                ns = "default";
+                name = placeholder;
+            }
 
-
-        // 3. return the processed string
-
-
-        throw new NotImplementedException();
+            try
+            {
+                var secret = _secretService.GetSecret(name, ns);
+                return secret.Value;
+            }
+            catch (SecretNotFoundException)
+            {
+                onWarning?.Invoke($"Secret '{ns}/{name}' not found, leaving placeholder.");
+                return match.Value;
+            }
+        });
     }
 
-    public void InjectToFile(string templatePath, string outputPath)
+    public void InjectToFile(string templatePath, string outputPath, Action<string>? onWarning = null)
     {
-        // 1. read template from disk
+        if (!File.Exists(templatePath))
+            throw new FileNotFoundException("Template not found.", templatePath);
 
+        if (Path.GetFullPath(templatePath) == Path.GetFullPath(outputPath))
+            throw new InvalidOperationException("Output path cannot be the same as template.");
 
-        // 2. content = InjectSecrets(templateContent)
-
-
-        // 3. write to outputPath
-        //    guard: don't allow outputPath == templatePath (would destroy the template)
-
-
-        throw new NotImplementedException();
+        string template = File.ReadAllText(templatePath);
+        string result = InjectSecrets(template, onWarning);
+        File.WriteAllText(outputPath, result);
     }
 }

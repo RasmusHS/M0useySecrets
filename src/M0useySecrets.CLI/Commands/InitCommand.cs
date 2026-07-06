@@ -16,6 +16,11 @@ public static class InitCommand
             var vaultService = services.GetRequiredService<IVaultService>();
 
             string password = PasswordPrompt.ReadPassword("Create master password: ");
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                ConsoleOutput.PrintError("Password cannot be empty.");
+                return 1;
+            }
             string confirm = PasswordPrompt.ReadPassword("Confirm master password: ");
 
             if (password != confirm)
@@ -24,9 +29,17 @@ public static class InitCommand
                 return 1;
             }
 
-            vaultService.Initialize(password);
-            ConsoleOutput.PrintSuccess("Vault created.");
-            return 0;
+            try
+            {
+                vaultService.Initialize(password);
+                ConsoleOutput.PrintSuccess("Vault created.");
+                return 0;
+            }
+            catch (InvalidOperationException ex)
+            {
+                ConsoleOutput.PrintError(ex.Message);
+                return 1;
+            }
         });
 
         return command;

@@ -15,7 +15,9 @@ var services = new ServiceCollection()
     .AddSingleton<IVaultStore, VaultStore>()
     .AddSingleton<IVaultService, VaultService>()
     .AddSingleton<ISecretService, SecretService>()
-    .AddSingleton<IExpiryService, ExpiryService>()
+    //.AddSingleton<IExpiryService, ExpiryService>()
+    .AddSingleton<ITemplateInjector, TemplateInjector>()
+    .AddSingleton<ITotpGenerator, TotpGenerator>()
     .BuildServiceProvider();
 
 var rootCommand = new RootCommand("M0useySecrets — encrypted secrets manager");
@@ -26,5 +28,8 @@ rootCommand.Subcommands.Add(GetCommand.Create(services));
 rootCommand.Subcommands.Add(ListCommand.Create(services));
 rootCommand.Subcommands.Add(RemoveCommand.Create(services));
 rootCommand.Subcommands.Add(UpdateCommand.Create(services));
+rootCommand.Subcommands.Add(ExportCommand.Create(services));
+rootCommand.Subcommands.Add(InjectCommand.Create(services));
+rootCommand.Subcommands.Add(TotpCommand.Create(services));
 
 return rootCommand.Parse(args).Invoke();

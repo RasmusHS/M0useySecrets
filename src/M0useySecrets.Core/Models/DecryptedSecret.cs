@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace M0useySecrets.Core.Models;
 
 public class DecryptedSecret
@@ -6,6 +8,7 @@ public class DecryptedSecret
     /// The unique identifier for the vault. 
     /// This is used to reference the vault in various operations, such as retrieving its contents or updating its information.
     /// </summary>
+    [JsonIgnore]
     public Guid Id { get; set; }
 
     /// <summary>
@@ -26,8 +29,10 @@ public class DecryptedSecret
     /// </summary>
     public string? Value { get; set; }
 
+    [JsonIgnore]
     public DateTime CreatedAt { get; set; }
 
+    [JsonIgnore]
     public DateTime UpdatedAt { get; set; }
 
     /// <summary>

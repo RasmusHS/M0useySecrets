@@ -1,5 +1,6 @@
 ﻿using System.CommandLine;
 using M0useySecrets.CLI.Helpers;
+using M0useySecrets.Core.Exceptions;
 using M0useySecrets.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -30,10 +31,29 @@ public static class GetCommand
 
             UnlockVault.WithUnlockedVault(services, () =>
             {
-                var secretService = services.GetRequiredService<ISecretService>();
-                var secret = secretService.GetSecret(name, ns).Value;
-                ConsoleOutput.PrintSuccess($"Secret '{secret}' copied to clipboard");
-                ClipboardHelper.CopyWithAutoClear(secret, 60);
+                try
+                {
+                    var secretService = services.GetRequiredService<ISecretService>();
+                    var secret = secretService.GetSecret(name, ns);
+
+                    if (copy)
+                    {
+                        ClipboardHelper.CopyWithAutoClear(secret.Value, 60);
+                        ConsoleOutput.PrintSuccess($"Secret '{name}' copied to clipboard.");
+                    }
+                    else
+                    {
+                        ConsoleOutput.PrintSecret(secret);
+                    }
+                }
+                catch (SecretNotFoundException)
+                {
+                    ConsoleOutput.PrintError($"Secret '{name}' not found in namespace '{ns}'.");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ConsoleOutput.PrintError(ex.Message);
+                }
             });
         });
 

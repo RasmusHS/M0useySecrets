@@ -7,6 +7,6 @@ public static class LockCommand
 {
     public static Command Create(ServiceProvider services)
     {
-
+        throw new NotImplementedException();
     }
 }

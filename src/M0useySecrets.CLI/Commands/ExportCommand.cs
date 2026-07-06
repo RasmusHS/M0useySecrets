@@ -1,4 +1,5 @@
 using System.CommandLine;
+using System.Text.Json;
 using M0useySecrets.CLI.Helpers;
 using M0useySecrets.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,9 +17,11 @@ public static class ExportCommand
             Description = "Output format",
             DefaultValueFactory = _ => "json"
         };
-        // optional: add a validator for format to restrict to "json" or "env"
 
         var command = new Command("export", "Export secret to a plaintext");
+        command.Arguments.Add(outputArg);
+        command.Options.Add(nsOption);
+        command.Options.Add(formatOption);
 
         command.SetAction(parseResult =>
         {
@@ -26,29 +29,54 @@ public static class ExportCommand
             var ns = parseResult.GetValue(nsOption);
             var format = parseResult.GetValue(formatOption);
 
+            if (format is not "json" and not "env")
+            {
+                ConsoleOutput.PrintError($"Unknown format: {format}. Use 'json' or 'env'.");
+                return;
+            }
+
             UnlockVault.WithUnlockedVault(services, () =>
             {
                 var secretService = services.GetRequiredService<ISecretService>();
                 var secrets = secretService.ListSecrets(ns);
 
-                // for export you DO need decrypted values, unlike list
-                // so fetch each one individually:
                 var decrypted = secrets.Select(s =>
                     secretService.GetSecret(s.Name, s.Namespace)).ToList();
+                var options = new JsonSerializerOptions { WriteIndented = true };
 
-                string content = format switch
+                ConsoleOutput.PrintWarning("Warning: this will write secrets in plaintext.");
+                Console.Write($"Export {decrypted.Count} secrets to {output}? [y/N] ");
+                string? confirmation = Console.ReadLine()?.Trim().ToLowerInvariant();
+                if (confirmation is not "y" and not "yes")
                 {
-                    //"json" => serialize decrypted to indented JSON
-                    //          (only export Name, Namespace, Value, ExpiresAt, Notes
-                    //            — not crypto fields),
-                    //"env" => string.Join("\n", decrypted.Select(s =>
-                    //          $"{s.Name.ToUpperInvariant().Replace('-', '_')}={s.Value}")),
-                    //_ => throw new ArgumentException($"Unknown format: {format}")
-                };
+                    ConsoleOutput.PrintWarning("Cancelled.");
+                    return;
+                }
 
-                File.WriteAllText(output, content);
-                ConsoleOutput.PrintSuccess($"Exported {decrypted.Count} secrets to {output}");
+                try
+                {
+                    string content = format switch
+                    {
+                        "json" => JsonSerializer.Serialize(decrypted, options),
+                        "env" => string.Join("\n", decrypted.Select(s =>
+                                  $"{s.Name.ToUpperInvariant().Replace('-', '_')}={s.Value}")),
+                        _ => throw new ArgumentException($"Unknown format: {format}")
+                    };
+
+                    File.WriteAllText(output, content);
+                    ConsoleOutput.PrintSuccess($"Exported {decrypted.Count} secrets to {output}");
+                }
+                catch (IOException ex)
+                {
+                    ConsoleOutput.PrintError($"Failed to write file: {ex.Message}");
+                }
+                catch (InvalidOperationException ex)
+                {
+                    ConsoleOutput.PrintError(ex.Message);
+                }
             });
         });
+
+        return command;
     }
 }
