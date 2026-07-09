@@ -35,7 +35,6 @@ public static class ExportCommand
 
         command.SetAction(parseResult =>
         {
-            //var output = parseResult.GetValue(outputArg);
             var ns = parseResult.GetValue(nsOption);
             var format = parseResult.GetValue(formatOption);
             var filename = parseResult.GetValue(filenameArg);

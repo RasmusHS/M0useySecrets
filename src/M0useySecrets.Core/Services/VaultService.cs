@@ -86,7 +86,7 @@ public class VaultService : IVaultService
 
         // 2. derive KEK from password + header.Salt + header.Iterations
         byte[] kek = _keyDerivation.DeriveKey(masterPassword, header.Salt, header.Iterations);
-        //Console.WriteLine(kek);
+
         // 3. load vault with KEK
         _vault = _store.LoadVault(kek);
 
