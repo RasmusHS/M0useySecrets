@@ -1,3 +1,4 @@
+using M0useySecrets.Core.Exceptions;
 using M0useySecrets.Core.Services.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -9,7 +10,16 @@ public static class UnlockVault
     {
         var vaultService = services.GetRequiredService<IVaultService>();
         string password = PasswordPrompt.ReadPassword();
-        vaultService.Unlock(password);
+        try
+        {
+            vaultService.Unlock(password);
+        }
+        catch (InvalidPasswordException)
+        {
+            ConsoleOutput.PrintError("Wrong password.");
+            return;
+        }
+
         try
         {
             action();

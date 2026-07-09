@@ -9,17 +9,39 @@ public static class InjectCommand
 {
     public static Command Create(ServiceProvider services)
     {
-        var templateArg = new Argument<string>("template") { Description = "Template file path" };
-        var outputArg = new Argument<string>("output") { Description = "Output file path" };
+        var templateNameArg = new Argument<string>("template") { Description = "Template file path" };
+        var templateDirOption = new Option<string>("--template-dir", "-td")
+        {
+            Description = "Template directory",
+            DefaultValueFactory = _ => "templates"
+        };
+        var filenameArg = new Option<string>("--filename", "-fn")
+        {
+            Description = "Output filename",
+            DefaultValueFactory = _ => ".env"
+        };
+        var outputDirOption = new Option<string>("--output-dir", "-od")
+        {
+            Description = "Output directory",
+            DefaultValueFactory = _ => "output"
+        };
 
         var command = new Command("inject", "Inject into template");
-        command.Arguments.Add(templateArg);
-        command.Arguments.Add(outputArg);
+        command.Arguments.Add(templateNameArg);
+        command.Options.Add(templateDirOption);
+        command.Options.Add(filenameArg);
+        command.Options.Add(outputDirOption);
 
         command.SetAction(parseResult =>
         {
-            var templatePath = parseResult.GetValue(templateArg);
-            var outputPath = parseResult.GetValue(outputArg);
+            var templateName = parseResult.GetValue(templateNameArg);
+            var templateDir = parseResult.GetValue(templateDirOption);
+            var templatePath = Path.Combine(templateDir, templateName);
+
+            var filename = parseResult.GetValue(filenameArg);
+            var outputDir = parseResult.GetValue(outputDirOption);
+            Directory.CreateDirectory(outputDir);
+            var outputPath = Path.Combine(outputDir, filename);
 
             // guard: template must exist
             if (!File.Exists(templatePath))

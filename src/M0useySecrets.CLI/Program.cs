@@ -28,6 +28,7 @@ rootCommand.Subcommands.Add(GetCommand.Create(services));
 rootCommand.Subcommands.Add(ListCommand.Create(services));
 rootCommand.Subcommands.Add(RemoveCommand.Create(services));
 rootCommand.Subcommands.Add(UpdateCommand.Create(services));
+rootCommand.Subcommands.Add(ImportCommand.Create(services));
 rootCommand.Subcommands.Add(ExportCommand.Create(services));
 rootCommand.Subcommands.Add(InjectCommand.Create(services));
 rootCommand.Subcommands.Add(TotpCommand.Create(services));

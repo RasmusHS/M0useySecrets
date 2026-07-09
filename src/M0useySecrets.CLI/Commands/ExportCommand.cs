@@ -10,24 +10,42 @@ public static class ExportCommand
 {
     public static Command Create(ServiceProvider services)
     {
-        var outputArg = new Argument<string>("output") { Description = "Output file path" };
         var nsOption = new Option<string?>("--namespace", "-ns") { Description = "Filter by namespace" };
         var formatOption = new Option<string>("--format", "-f")
         {
             Description = "Output format",
             DefaultValueFactory = _ => "json"
         };
+        var filenameArg = new Option<string>("--filename", "-fn")
+        {
+            Description = "Output filename",
+            DefaultValueFactory = _ => "secrets"
+        };
+        var outputDirOption = new Option<string>("--output-dir", "-od")
+        {
+            Description = "Output directory",
+            DefaultValueFactory = _ => "output"
+        };
 
-        var command = new Command("export", "Export secret to a plaintext");
-        command.Arguments.Add(outputArg);
+        var command = new Command("export", "Export secret to a plaintext file.");
+        command.Options.Add(filenameArg);
+        command.Options.Add(outputDirOption);
         command.Options.Add(nsOption);
         command.Options.Add(formatOption);
 
         command.SetAction(parseResult =>
         {
-            var output = parseResult.GetValue(outputArg);
+            //var output = parseResult.GetValue(outputArg);
             var ns = parseResult.GetValue(nsOption);
             var format = parseResult.GetValue(formatOption);
+            var filename = parseResult.GetValue(filenameArg);
+            var outputDir = parseResult.GetValue(outputDirOption);
+            Directory.CreateDirectory(outputDir); // ensure it exists
+            var output = Path.Combine(outputDir, filename);
+
+            var extension = format == "json" ? ".json" : ".env";
+            if (!Path.HasExtension(filename))
+                filename += extension;
 
             if (format is not "json" and not "env")
             {
